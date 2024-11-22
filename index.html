@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moving 1000 Windows</title>
+  <script>
+    window.onload = function () {
+      const windows = [];
+      const url = "https://example.com"; // 열고 싶은 URL
+
+      // 창 열기 및 초기화
+      for (let i = 0; i < 1000; i++) {
+        const newWindow = window.open(
+          url,
+          "_blank",
+          `width=300,height=200,left=${i * 10 % screen.width},top=${i * 5}`
+        );
+        if (newWindow) {
+          windows.push({
+            win: newWindow,
+            top: i * 5, // 초기 top 위치
+            direction: 1, // 1: 아래로, -1: 위로
+          });
+        }
+      }
+
+      // 창을 주기적으로 이동
+      setInterval(() => {
+        windows.forEach((obj, index) => {
+          if (!obj.win || obj.win.closed) return; // 창이 닫혔으면 무시
+
+          // 위아래로 이동
+          obj.top += obj.direction * 10;
+          if (obj.top > screen.height - 200 || obj.top < 0) {
+            obj.direction *= -1; // 방향 반전
+          }
+
+          try {
+            obj.win.moveTo(index * 10 % screen.width, obj.top); // 창 이동
+          } catch (e) {
+            console.warn("Window move blocked by browser:", e.message);
+          }
+        });
+      }, 50); // 50ms마다 이동
+    };
+  </script>
+</head>
+<body>
+  <h1>Opening and moving 1000 windows...</h1>
+  <p>If this does not work, your browser may be blocking pop-ups or move requests.</p>
+</body>
+</html>
